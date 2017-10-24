@@ -9,6 +9,7 @@ import logging
 import json
 
 import jinja2
+from twisted.internet.defer import Deferred
 from txsockjs.factory import SockJSResource
 
 from twisted.internet import reactor, defer, task, protocol
@@ -230,8 +231,9 @@ class WebUI(resource.Resource):
         return ap
 
     def get_ap_data(self):
-        return map( self.ap_info,
-            sorted(self.nm.wifi_aps.viewvalues(), key=op.attrgetter('uid')) )
+        aps = [ap for ap in self.nm.wifi_aps.values() if not isinstance(ap, Deferred)]
+        aps.sort(key=op.attrgetter('strength'), reverse=True)
+        return [self.ap_info(ap) for ap in aps]
 
     def get_config_params(self, config):
         addrs = list()

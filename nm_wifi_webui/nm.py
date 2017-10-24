@@ -600,6 +600,9 @@ class NMInterface(service.MultiService):
     def wifi_changed( self, dev, dbus_iface, props, props_missing=None, _should_not_change=None):
         if _should_not_change is None:
             _should_not_change = ['Autoconnect', 'PermHwAddress']
+        if not props:
+            return
+
         for k, v in props.viewitems():
             if k in _should_not_change:
                 self.log.warn('Unexpected dev property change: %r = %r', k, v)
